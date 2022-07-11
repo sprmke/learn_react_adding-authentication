@@ -7,6 +7,7 @@ const AuthForm = () => {
   const passwordInputRef = useRef();
 
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
@@ -19,6 +20,7 @@ const AuthForm = () => {
     const enteredPassword = passwordInputRef.current.value;
 
     // optional: Add validation
+    setIsLoading(true);
 
     const FIREBASE_API_KEY = 'AIzaSyASensa2kcDyfO8fTPaBITTrH6WWXPaUZE';
 
@@ -40,14 +42,15 @@ const AuthForm = () => {
           }
         );
 
-        if (!response.ok) {
-          throw new Error('Sign up failed!');
-        }
-
         const data = await response.json();
-        console.log('data::', data);
+
+        if (data.error) {
+          throw new Error(data.error.message);
+        }
       } catch (error) {
-        console.error('error:', error);
+        alert(error || 'Sign Up failed!');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -70,7 +73,10 @@ const AuthForm = () => {
           />
         </div>
         <div className={classes.actions}>
-          <button>{isLogin ? 'Login' : 'Create Account'}</button>
+          {!isLoading && (
+            <button>{isLogin ? 'Login' : 'Create Account'}</button>
+          )}
+          {isLoading && <p>Loading...</p>}
           <button
             type='button'
             className={classes.toggle}
