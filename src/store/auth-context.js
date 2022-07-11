@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 const AuthContext = React.createContext({
   token: '',
@@ -14,25 +14,60 @@ const calculateRemainingTime = (expirationTime) => {
   return futureExpirationTime - currentTime;
 };
 
+let logoutTimer = null;
+
+const retrieveStoredToken = () => {
+  const storedToken = localStorage.getItem('token');
+  const storedExpirationDate = localStorage.getItem('expirationTime');
+
+  const remainingTime = calculateRemainingTime(storedExpirationDate);
+
+  const ONE_MINUTE_IN_MILLISECONDS = 60000;
+  if (remainingTime <= ONE_MINUTE_IN_MILLISECONDS) {
+    localStorage.removeItem('token');
+    localStorage.removeItem('expirationTime');
+    return null;
+  }
+
+  return {
+    token: storedToken,
+    duration: remainingTime,
+  };
+};
+
 export const AuthContextProvider = (props) => {
-  const initialToken = localStorage.getItem('token');
+  const tokenData = retrieveStoredToken();
+  const initialToken = tokenData ? tokenData.token : null;
   const [token, setToken] = useState(initialToken);
 
   const userIsLoggedIn = !!token;
 
-  const logoutHandler = () => {
+  const logoutHandler = useCallback(() => {
     setToken(null);
     localStorage.removeItem('token');
-  };
+    localStorage.removeItem('expirationTime');
+
+    if (logoutTimer) {
+      clearTimeout(logoutTimer);
+    }
+  }, []);
 
   const loginHandler = (token, expirationTime) => {
     setToken(token);
     localStorage.setItem('token', token);
+    localStorage.setItem('expirationTime', expirationTime);
 
     const remainingTime = calculateRemainingTime(expirationTime);
 
-    setTimeout(logoutHandler, remainingTime);
+    logoutTimer = setTimeout(logoutHandler, remainingTime);
   };
+
+  useEffect(() => {
+    if (tokenData) {
+      console.log('tokenData.duration::', tokenData.duration);
+      logoutTimer = setTimeout(logoutHandler, tokenData.duration);
+    }
+  }, [tokenData, logoutHandler]);
 
   const contextValue = {
     token,
