@@ -28,7 +28,6 @@ function App() {
         <Route path='*'>
           <Redirect to='/' />
         </Route>
-
         {/* Alternative approach:
         <Route path='/profile'>
           {authCtx.isLoggedIn && <UserProfile />}
