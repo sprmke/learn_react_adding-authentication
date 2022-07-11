@@ -25,38 +25,36 @@ const AuthForm = () => {
     // optional: Add validation
     setIsLoading(true);
 
-    const FIREBASE_API_KEY = 'AIzaSyASensa2kcDyfO8fTPaBITTrH6WWXPaUZE';
+    const FIREBASE_AUTH_BASE_URL =
+      'https://identitytoolkit.googleapis.com/v1/accounts:';
+    const FIREBASE_AUTH_ACTION = isLogin ? 'signInWithPassword' : 'signUp';
+    const FIREBASE_AUTH_API_KEY = 'AIzaSyASensa2kcDyfO8fTPaBITTrH6WWXPaUZE';
+    const FIREBASE_AUTH_URL = `${FIREBASE_AUTH_BASE_URL}${FIREBASE_AUTH_ACTION}?key=${FIREBASE_AUTH_API_KEY}`;
 
-    if (isLogin) {
-    } else {
-      try {
-        const response = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              email: enteredEmail,
-              password: enteredPassword,
-              returnSecureToken: true,
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+    try {
+      const response = await fetch(FIREBASE_AUTH_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword,
+          returnSecureToken: true,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.error) {
-          throw new Error(data.error.message);
-        }
-
-        authCtx.login(data.idToken);
-      } catch (error) {
-        alert(error || 'Sign Up failed!');
-      } finally {
-        setIsLoading(false);
+      if (data.error) {
+        throw new Error(data.error.message);
       }
+
+      authCtx.login(data.idToken);
+    } catch (error) {
+      alert(error || 'Sign Up failed!');
+    } finally {
+      setIsLoading(false);
     }
   };
 
