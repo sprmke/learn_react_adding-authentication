@@ -52,7 +52,7 @@ const AuthForm = () => {
 
       authCtx.login(data.idToken);
     } catch (error) {
-      alert(error || 'Sign Up failed!');
+      alert(error || 'Authentication Failed!');
     } finally {
       setIsLoading(false);
     }
