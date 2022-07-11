@@ -53,7 +53,11 @@ const AuthForm = () => {
         throw new Error(data.error.message);
       }
 
-      authCtx.login(data.idToken);
+      // Firebase expiresIn = 3600 seconds
+      const expirationTime = new Date(
+        new Date().getTime() + +data.expiresIn * 1000
+      );
+      authCtx.login(data.idToken, expirationTime.toISOString());
       history.replace('/');
     } catch (error) {
       alert(error || 'Authentication Failed!');
