@@ -24,20 +24,20 @@ const ProfileForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        'https://identitytoolkit.googleapis.com/v1/accounts:update?key=AIzaSyASensa2kcDyfO8fTPaBITTrH6WWXPaUZE',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            idToken: token,
-            password: enteredNewPassword,
-            returnSecureToken: false,
-          }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const FIREBASE_AUTH_API_KEY = process.env.REACT_APP_FIREBASE_AUTH_API_KEY;
+      const FIREBASE_AUTH_URL = `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${FIREBASE_AUTH_API_KEY}`;
+
+      const response = await fetch(FIREBASE_AUTH_URL, {
+        method: 'POST',
+        body: JSON.stringify({
+          idToken: token,
+          password: enteredNewPassword,
+          returnSecureToken: false,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       const data = await response.json();
 

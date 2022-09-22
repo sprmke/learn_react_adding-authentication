@@ -31,7 +31,7 @@ const AuthForm = () => {
     const FIREBASE_AUTH_BASE_URL =
       'https://identitytoolkit.googleapis.com/v1/accounts:';
     const FIREBASE_AUTH_ACTION = isLogin ? 'signInWithPassword' : 'signUp';
-    const FIREBASE_AUTH_API_KEY = 'AIzaSyASensa2kcDyfO8fTPaBITTrH6WWXPaUZE';
+    const FIREBASE_AUTH_API_KEY = process.env.REACT_APP_FIREBASE_AUTH_API_KEY;
     const FIREBASE_AUTH_URL = `${FIREBASE_AUTH_BASE_URL}${FIREBASE_AUTH_ACTION}?key=${FIREBASE_AUTH_API_KEY}`;
 
     try {
